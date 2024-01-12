@@ -1,0 +1,30 @@
+[package]
+name = "jar-reader"
+version = "0.1.0"
+license = "ISC"
+edition = "2018"
+exclude = ["index.node"]
+
+[lib]
+crate-type = ["cdylib"]
+proc-macro = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+binread = "2.2.0"
+bitflags = "2.4.1"
+byteorder = "1.5.0"
+derive-try-from-primitive = "1.0.0"
+derive_more = "0.99.17"
+enum_dispatch = "0.3.12"
+thiserror = "1.0.56"
+
+[dependencies.neon]
+version = "0.10"
+default-features = false
+features = ["napi-6"]
+
+[[test]]
+name = "test"
+path = "tests/test.rs"
