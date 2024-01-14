@@ -1,4 +1,4 @@
-use std::{io, result, str::Utf8Error, string::FromUtf8Error};
+use std::{io, result, string::FromUtf8Error};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -14,6 +14,9 @@ pub enum ParseError {
 
     #[error("FromUtf8 error: {0}")]
     Utf8Error(FromUtf8Error),
+
+    #[error("Invalid access flags: {0:#X}")]
+    InvalidAccessFlags(u16),
 
     #[error("{0}")]
     Other(String),
