@@ -15,6 +15,6 @@ impl Readable for Interfaces {
                 index: Index::read(reader)?,
             });
         }
-        Ok(Self { interfaces })
+        Ok(interfaces)
     }
 }

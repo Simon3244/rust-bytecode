@@ -14,7 +14,7 @@ impl Readable for Fields {
         for _ in 0..fields_count {
             fields.push(Field::read(reader)?);
         }
-        Ok(Self { fields })
+        Ok(fields)
     }
 }
 

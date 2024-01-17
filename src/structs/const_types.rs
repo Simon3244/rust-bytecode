@@ -1,9 +1,10 @@
 use std::marker::PhantomData;
 
-use crate::Result;
+use crate::{impl_get_pretty, pretty_print::GetPretty, Result};
 
 use super::{const_pool::TryFromItem, ConstPool};
 
+impl_get_pretty! {
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConstItem {
     Utf8(Utf8),
@@ -23,6 +24,7 @@ pub enum ConstItem {
     InvokeDynamic(InvokeDynamic),
     Module(Module),
     Package(Package),
+}
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -50,11 +52,32 @@ impl<T: TryFromItem> Index<T> {
     }
 }
 
+impl<T: TryFromItem + GetPretty> GetPretty for Index<T> {
+    fn get_pretty(&self, pool: &ConstPool, tabs: usize) -> Result<String> {
+        let item = self.get(pool)?;
+        Ok(format!(
+            "{:indent$}Index({}): {}",
+            "",
+            self.index,
+            item.get_pretty(pool, tabs)?.trim_start(),
+            indent = tabs
+        ))
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Utf8 {
     pub bytes: Vec<u8>,
     pub str: String,
 }
+
+impl GetPretty for Utf8 {
+    fn get_pretty(&self, _pool: &ConstPool, tabs: usize) -> Result<String> {
+        Ok(format!("{:indent$}{:?}", "", self.str, indent = tabs))
+    }
+}
+
+impl_get_pretty! {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Integer {
@@ -160,4 +183,5 @@ pub struct Module {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Package {
     pub name_index: Index<Utf8>,
+}
 }

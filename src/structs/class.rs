@@ -1,4 +1,4 @@
-use crate::error::Result;
+use crate::impl_get_pretty;
 
 use super::{
     access_flags::ClassFlags, attributes::Attributes, const_types::Class as ConstClass,
@@ -7,6 +7,7 @@ use super::{
 
 pub const MAGIC: u32 = 0xCAFEBABE;
 
+impl_get_pretty! {
 #[derive(Debug)]
 pub struct Class {
     pub magic: u32,
@@ -19,4 +20,5 @@ pub struct Class {
     pub fields: Fields,
     pub methods: Methods,
     pub attributes: Attributes,
+}
 }

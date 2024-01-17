@@ -1,4 +1,5 @@
 #![allow(non_camel_case_types)]
+use crate::impl_get_pretty;
 
 macro_rules! gen_try_from {
     (
@@ -7,9 +8,11 @@ macro_rules! gen_try_from {
             $($variant:ident = $value:expr,)*
         }
     ) => {
+        impl_get_pretty! {
         $(#[$attr])*
         pub enum $Name {
             $($variant = $value,)*
+        }
         }
 
         impl std::convert::TryFrom<u8> for $Name {

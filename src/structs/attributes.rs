@@ -1,8 +1,6 @@
-use std::{convert::TryFrom, io::Cursor};
+use std::io::Cursor;
 
-use byteorder::ReadBytesExt;
-
-use crate::{error::ParseError, Readable, Result};
+use crate::{impl_get_pretty, Classify, Readable, Result};
 
 use super::{
     access_flags::{
@@ -13,27 +11,32 @@ use super::{
     ConstItem, ConstPool, Index, OptionalIndex,
 };
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct Attributes {
-    pub attributes: Vec<Attribute>,
-}
+// #[derive(Debug, Clone, PartialEq)]
+// pub struct Attributes {
+//     pub attributes: Vec<Attribute>,
+// }
+
+pub type Attributes = Vec<Attribute>;
+
+impl_get_pretty! {
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Attribute {
     pub attribute_name_index: Index<Utf8>,
     pub info: AttributeInfo,
 }
+}
 
-impl Attributes {
-    pub fn classify(&mut self, const_pool: &ConstPool) {
-        for attribute in &mut self.attributes {
+impl Classify for Vec<Attribute> {
+    fn classify(&mut self, const_pool: &ConstPool) -> Result<()> {
+        Ok(for attribute in self.iter_mut() {
             match attribute.classify(const_pool) {
                 Ok(_) => {}
                 Err(e) => {
                     println!("Error classifying attribute: {:?}", e);
                 }
             }
-        }
+        })
     }
 }
 
@@ -51,12 +54,10 @@ impl Attribute {
         self.info = info;
 
         if let AttributeInfo::Code(code) = &mut self.info {
-            code.attributes.classify(pool);
-        }
-
-        if let AttributeInfo::Record(record) = &mut self.info {
+            code.attributes.classify(pool)?;
+        } else if let AttributeInfo::Record(record) = &mut self.info {
             for component in &mut record.components {
-                component.attributes.classify(pool);
+                component.attributes.classify(pool)?;
             }
         }
         Ok(())
@@ -76,10 +77,13 @@ macro_rules! gen_get {
             $($variant:ident($value:ident),)*
         }
     ) => {
+        impl_get_pretty! {
         $(#[$attr])*
         pub enum $name {
             $($variant($value),)*
         }
+        }
+
 
         impl Get for $name {
             fn get<R: std::io::Read>(attr_name: &str, reader: &mut R) -> Result<Self> {
@@ -132,6 +136,7 @@ gen_get! {
     }
 }
 
+impl_get_pretty! {
 #[derive(Debug, Clone, PartialEq)]
 pub struct ConstantValue {
     pub constant_value_index: Index<ConstItem>,
@@ -158,6 +163,8 @@ pub struct ExceptionTable {
 // pub struct StackMapTable {
 //     pub bytes: Vec<u8>,
 // }
+// }
+
 pub type StackMapTable = NotImplemented;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -422,4 +429,5 @@ pub struct Unknown {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NotImplemented {
     pub bytes: Vec<u8>,
+}
 }

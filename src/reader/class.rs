@@ -5,6 +5,7 @@ use byteorder::{BigEndian, ReadBytesExt};
 use crate::structs::access_flags::ClassFlags;
 use crate::structs::attributes::Attributes;
 use crate::structs::{ClassVersion, ConstPool, Fields, Index, Interfaces, Methods};
+use crate::Classify;
 use crate::{error::ParseError, Result};
 
 use crate::{structs::Class, Readable};
@@ -24,9 +25,9 @@ impl Readable for Class {
         let mut fields = Fields::read(reader)?;
         let mut methods = Methods::read(reader)?;
         let mut attributes = Attributes::read(reader)?;
-        fields.classify_attributes(&constant_pool);
-        methods.classify_attributes(&constant_pool);
-        attributes.classify(&constant_pool);
+        fields.classify(&constant_pool)?;
+        methods.classify(&constant_pool)?;
+        attributes.classify(&constant_pool)?;
         Ok(Class {
             magic,
             version,

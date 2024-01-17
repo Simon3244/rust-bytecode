@@ -76,3 +76,30 @@ bitflags! {
 
 pub type FieldFlags = MethodFlags;
 pub type OpensFlags = ExportsFlags;
+
+macro_rules! impl_get_pretty {
+    ($($name:ident,)*) => {
+        $(
+            impl crate::pretty_print::GetPretty for $name {
+                fn get_pretty(&self, _pool: &super::ConstPool, tabs: usize) -> crate::error::Result<String> {
+                    let mut result = String::new();
+                    self.iter_names().for_each(|(name, _)| {
+                        result.push_str(&format!("{:indent$}{}", "", name, indent = tabs));
+                        result.push_str("\n");
+                    });
+                    Ok(result)
+                }
+            }
+        )*
+    };
+}
+
+impl_get_pretty! {
+    MethodFlags,
+    ClassFlags,
+    InnerClassFlags,
+    ModuleFlags,
+    MethodParameterFlags,
+    RequiresFlags,
+    ExportsFlags,
+}

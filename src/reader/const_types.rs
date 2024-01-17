@@ -3,7 +3,7 @@ use std::io::Read;
 use byteorder::{BigEndian, ReadBytesExt};
 use cesu8::from_java_cesu8;
 
-use crate::structs::{const_types::*, ConstPool};
+use crate::structs::const_types::*;
 use crate::{Readable, Result};
 
 use crate::structs::const_pool::TryFromItem;

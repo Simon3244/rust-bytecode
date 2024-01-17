@@ -14,7 +14,7 @@ impl Readable for Methods {
         for _ in 0..methods_count {
             methods.push(Method::read(reader)?);
         }
-        Ok(Self { methods })
+        Ok(methods)
     }
 }
 

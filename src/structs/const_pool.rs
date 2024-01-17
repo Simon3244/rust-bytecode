@@ -1,6 +1,7 @@
 use super::{ConstItem, Index};
 use crate::{
     error::ParseError,
+    impl_get_pretty,
     structs::const_types::{
         Class, Double, Dynamic, FieldRef, Float, Integer, InterfaceMethodRef, InvokeDynamic, Long,
         MethodHandle, MethodRef, MethodType, Module, NameAndType, Package, StringJ, Utf8,
@@ -8,9 +9,11 @@ use crate::{
     Result,
 };
 
+impl_get_pretty! {
 #[derive(Debug)]
 pub struct ConstPool {
     pub entries: Vec<Option<ConstItem>>,
+}
 }
 
 impl ConstPool {

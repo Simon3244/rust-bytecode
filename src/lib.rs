@@ -30,6 +30,10 @@ pub trait Writable {
     fn write<W: Write>(&self, writer: &mut W) -> Result<()>;
 }
 
+pub trait Classify {
+    fn classify(&mut self, pool: &crate::structs::ConstPool) -> Result<()>;
+}
+
 // Macro to generate the TryFrom impl for an enum
 
 #[macro_export]
@@ -40,9 +44,11 @@ macro_rules! gen_try_from {
             $($variant:ident = $value:expr,)*
         }
     ) => {
-        $(#[$attr])*
-        pub enum $Name {
-            $($variant = $value,)*
+        crate::impl_get_pretty! {
+            $(#[$attr])*
+            pub enum $Name {
+                $($variant = $value,)*
+            }
         }
 
         impl std::convert::TryFrom<u16> for $Name {
@@ -66,7 +72,7 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
 
 #[cfg(test)]
 mod tests {
-    use crate::structs::{const_types::MethodRef, ConstItem, Index};
+    use crate::pretty_print::GetPretty;
 
     use super::*;
     use std::process::Command;
@@ -83,23 +89,35 @@ mod tests {
         let mut reader = std::io::BufReader::new(file);
         // let class = class::Class::read(&mut reader).expect("Failed to read class file");
         let class = structs::Class::read(&mut reader).expect("Failed to read class file");
-        println!("{:#?}", class);
+        println!(
+            "{}",
+            class
+                .get_pretty(&class.constant_pool, 0)
+                .expect("Failed to get pretty version")
+        );
+        // println!(
+        //     "{}",
+        //     class
+        //         .access_flags
+        //         .get_pretty(&class.constant_pool, 0)
+        //         .expect("Failed to get pretty version")
+        // );
 
-        class.methods.methods.iter().for_each(|method| {
-            method
-                .attributes
-                .attributes
-                .iter()
-                .filter(|attr| {
-                    attr.attribute_name_index
-                        .get(&class.constant_pool)
-                        .unwrap()
-                        .str
-                        == "Code"
-                })
-                .for_each(|code| {
-                    println!("{:#?}", code);
-                });
-        });
+        // class.methods.methods.iter().for_each(|method| {
+        //     method
+        //         .attributes
+        //         .attributes
+        //         .iter()
+        //         .filter(|attr| {
+        //             attr.attribute_name_index
+        //                 .get(&class.constant_pool)
+        //                 .unwrap()
+        //                 .str
+        //                 == "Code"
+        //         })
+        //         .for_each(|code| {
+        //             println!("{:#?}", code);
+        //         });
+        // });
     }
 }

@@ -15,14 +15,14 @@ use crate::{
     Readable, Result,
 };
 
-impl Readable for Attributes {
+impl Readable for Vec<Attribute> {
     fn read<R: Read>(reader: &mut R) -> Result<Self> {
         let attributes_count = reader.read_u16::<BigEndian>()?;
         let mut attributes = Vec::with_capacity(attributes_count as usize);
         for _ in 0..attributes_count {
             attributes.push(Attribute::read(reader)?);
         }
-        Ok(Self { attributes })
+        Ok(attributes)
     }
 }
 

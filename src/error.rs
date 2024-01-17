@@ -1,4 +1,4 @@
-use std::{io, result, string::FromUtf8Error};
+use std::{io, string::FromUtf8Error};
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -34,4 +34,4 @@ impl From<FromUtf8Error> for ParseError {
     }
 }
 
-pub type Result<T> = result::Result<T, ParseError>;
+pub type Result<T> = std::result::Result<T, ParseError>;
